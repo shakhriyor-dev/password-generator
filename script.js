@@ -15,7 +15,6 @@ const clearHistoryBtn = document.getElementById('clear-history');
 
 let passwordHistory = JSON.parse(localStorage.getItem('pw-history')) || [];
 
-// 1. Xavfsiz generatsiya mantiqi
 const getRandomByte = () => {
     const array = new Uint8Array(1);
     window.crypto.getRandomValues(array);
@@ -29,7 +28,6 @@ const randomFunc = {
     symbol: () => "!@#$%^&*()_+~`|}{[]:;?><,./-=".charAt(getRandomByte() % 29)
 };
 
-// 2. Parol yaratish
 function generatePassword(lower, upper, number, symbol, length) {
     let generatedPassword = '';
     const typesArr = [{lower}, {upper}, {number}, {symbol}].filter(item => Object.values(item)[0]);
@@ -41,16 +39,14 @@ function generatePassword(lower, upper, number, symbol, length) {
         });
     }
     const finalPassword = generatedPassword.slice(0, length).split('').sort(() => getRandomByte() - 128).join('');
-    
     addToHistory(finalPassword);
     return finalPassword;
 }
 
-// 3. Tarixni boshqarish
 function addToHistory(pw) {
     if (pw === 'Tanlang!') return;
-    passwordHistory.unshift(pw); // Boshiga qo'shish
-    if (passwordHistory.length > 5) passwordHistory.pop(); // Faqat 5 tasini saqlash
+    passwordHistory.unshift(pw);
+    if (passwordHistory.length > 5) passwordHistory.pop();
     localStorage.setItem('pw-history', JSON.stringify(passwordHistory));
     renderHistory();
 }
@@ -58,7 +54,7 @@ function addToHistory(pw) {
 function renderHistory() {
     historyList.innerHTML = passwordHistory.map(pw => `
         <li class="history-item" onclick="copyFromHistory('${pw}')">
-            <span>${pw.substring(0, 15)}${pw.length > 15 ? '...' : ''}</span>
+            <span>${pw.substring(0, 15)}...</span>
             <small>📋</small>
         </li>
     `).join('');
@@ -68,18 +64,13 @@ window.copyFromHistory = (pw) => {
     navigator.clipboard.writeText(pw);
     resultEl.innerText = pw;
     updateStrength(pw);
+    const originalColor = resultEl.style.color;
+    resultEl.style.color = 'var(--success)';
+    setTimeout(() => resultEl.style.color = originalColor, 500);
 };
 
-clearHistoryBtn.addEventListener('click', () => {
-    passwordHistory = [];
-    localStorage.removeItem('pw-history');
-    renderHistory();
-});
-
-// 4. Event Listeners
 generateEl.addEventListener('click', () => {
-    const length = +lengthEl.value;
-    const password = generatePassword(lowercaseEl.checked, uppercaseEl.checked, numbersEl.checked, symbolsEl.checked, length);
+    const password = generatePassword(lowercaseEl.checked, uppercaseEl.checked, numbersEl.checked, symbolsEl.checked, +lengthEl.value);
     resultEl.innerText = password;
     updateStrength(password);
 });
@@ -100,10 +91,16 @@ clipboardEl.addEventListener('click', () => {
     const password = resultEl.innerText;
     if (!password || password === 'Tanlang!') return;
     navigator.clipboard.writeText(password).then(() => {
-        const originalText = resultEl.innerText;
+        const oldText = resultEl.innerText;
         resultEl.innerText = 'NUSXALANDI! ✅';
-        setTimeout(() => resultEl.innerText = originalText, 1000);
+        setTimeout(() => resultEl.innerText = oldText, 1000);
     });
+});
+
+clearHistoryBtn.addEventListener('click', () => {
+    passwordHistory = [];
+    localStorage.removeItem('pw-history');
+    renderHistory();
 });
 
 function updateStrength(password) {
@@ -116,7 +113,6 @@ function updateStrength(password) {
     strengthBar.style.backgroundColor = strength <= 25 ? 'var(--danger)' : strength <= 75 ? 'var(--warning)' : 'var(--success)';
 }
 
-// Dastlabki yuklash
 renderHistory();
 if (localStorage.getItem('pw-theme') === 'light') {
     document.body.classList.add('light-mode');
