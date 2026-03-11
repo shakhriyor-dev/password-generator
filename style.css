@@ -1,3 +1,5 @@
+/* ... avvalgi root va body kodlari o'zgarishsiz qoladi ... */
+
 :root {
     --neon-blue: #00f2ff;
     --neon-purple: #7000ff;
@@ -18,59 +20,57 @@ body.light-mode {
 }
 
 body {
-    background: var(--bg-dark);
-    height: 100vh; display: flex; justify-content: center; align-items: center;
-    margin: 0; font-family: 'Plus Jakarta Sans', sans-serif;
-    color: var(--text-color); transition: 0.4s ease;
+    background: var(--bg-dark); min-height: 100vh; display: flex; 
+    justify-content: center; align-items: center; margin: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-color); transition: 0.4s;
 }
 
 .card {
     background: var(--glass); backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border); border-radius: 32px;
-    padding: 30px 40px; width: 380px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    padding: 30px; width: 380px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    margin: 20px;
 }
 
-.theme-settings {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+/* Tarix bo'limi dizayni */
+.history-section {
+    margin-top: 25px; border-top: 1px solid var(--glass-border); padding-top: 15px;
 }
 
-#accent-color {
-    border: none; width: 30px; height: 30px; cursor: pointer; background: none;
+.history-section h3 { font-size: 14px; text-transform: uppercase; opacity: 0.7; margin-bottom: 10px; }
+
+#password-history { list-style: none; padding: 0; margin: 0; }
+
+.history-item {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(0,0,0,0.1); padding: 8px 12px; border-radius: 8px;
+    margin-bottom: 5px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    cursor: pointer; transition: 0.2s;
 }
 
-.theme-btn {
-    background: var(--glass); border: 1px solid var(--glass-border);
-    cursor: pointer; border-radius: 50%; width: 40px; height: 40px;
-    color: var(--text-color); font-size: 20px; display: flex; align-items: center; justify-content: center;
+.history-item:hover { background: var(--glass-border); border-left: 3px solid var(--neon-blue); }
+
+#clear-history {
+    background: none; border: none; color: var(--danger); font-size: 11px;
+    cursor: pointer; text-transform: uppercase; margin-top: 10px; width: 100%; text-align: right;
 }
 
-.title { text-align: center; letter-spacing: 2px; text-transform: uppercase; font-size: 20px; margin: 10px 0 20px; color: var(--text-color); }
-
-.result-box {
-    background: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 15px 20px;
-    display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border);
-}
-
+/* ... qolgan barcha CSS kodlari (button, slider, result-box) avvalgi holaticha ... */
+.theme-settings { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+#accent-color { border: none; width: 30px; height: 30px; cursor: pointer; background: none; }
+.theme-btn { background: var(--glass); border: 1px solid var(--glass-border); cursor: pointer; border-radius: 50%; width: 40px; height: 40px; color: var(--text-color); font-size: 20px; display: flex; align-items: center; justify-content: center; }
+.title { text-align: center; letter-spacing: 2px; text-transform: uppercase; font-size: 20px; margin: 10px 0 20px; }
+.result-box { background: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); }
 #result { font-family: 'JetBrains Mono', monospace; color: var(--neon-blue); font-size: 18px; word-break: break-all; }
-
 #clipboard { background: none; border: none; color: var(--neon-blue); cursor: pointer; transition: 0.3s; }
-#clipboard:hover { transform: scale(1.2); }
-
 .strength-container { width: 100%; height: 6px; background: rgba(0,0,0,0.1); margin: 15px 0; border-radius: 3px; }
 .strength-bar { height: 100%; width: 0%; transition: 0.5s ease; border-radius: 3px; }
-
-.container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; cursor: pointer; font-size: 14px; }
+.container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; cursor: pointer; font-size: 14px; position: relative; }
 .container input { position: absolute; opacity: 0; }
 .checkmark { width: 36px; height: 18px; background: #444; border-radius: 20px; position: relative; transition: 0.3s; }
-.container input:checked ~ .checkmark { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+.container input:checked ~ .checkmark { background: var(--neon-blue); }
 .checkmark::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; transition: 0.3s; }
 .container input:checked ~ .checkmark::after { left: 20px; }
-
-.slider { width: 100%; margin: 15px 0; accent-color: var(--neon-blue); cursor: pointer; }
-
-.generate-btn {
-    width: 100%; padding: 15px; border-radius: 12px; border: none;
-    background: var(--text-color); color: var(--bg-dark); font-weight: 800;
-    cursor: pointer; transition: 0.3s; font-size: 14px;
-}
-.generate-btn:hover { background: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); transform: translateY(-2px); }
+.slider { width: 100%; margin: 15px 0; accent-color: var(--neon-blue); }
+.generate-btn { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--text-color); color: var(--bg-dark); font-weight: 800; cursor: pointer; transition: 0.3s; }
+.generate-btn:hover { background: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }

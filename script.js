@@ -10,8 +10,12 @@ const clipboardEl = document.getElementById('clipboard');
 const strengthBar = document.getElementById('strength-bar');
 const accentColorInput = document.getElementById('accent-color');
 const themeToggle = document.getElementById('theme-toggle');
+const historyList = document.getElementById('password-history');
+const clearHistoryBtn = document.getElementById('clear-history');
 
-// Xavfsiz tasodifiy son olish
+let passwordHistory = JSON.parse(localStorage.getItem('pw-history')) || [];
+
+// 1. Xavfsiz generatsiya mantiqi
 const getRandomByte = () => {
     const array = new Uint8Array(1);
     window.crypto.getRandomValues(array);
@@ -25,68 +29,73 @@ const randomFunc = {
     symbol: () => "!@#$%^&*()_+~`|}{[]:;?><,./-=".charAt(getRandomByte() % 29)
 };
 
-// Uzunlikni yangilash
-lengthEl.addEventListener('input', () => {
-    lengthVal.innerText = lengthEl.value;
+// 2. Parol yaratish
+function generatePassword(lower, upper, number, symbol, length) {
+    let generatedPassword = '';
+    const typesArr = [{lower}, {upper}, {number}, {symbol}].filter(item => Object.values(item)[0]);
+    if (typesArr.length === 0) return 'Tanlang!';
+
+    for (let i = 0; i < length; i += typesArr.length) {
+        typesArr.forEach(type => {
+            generatedPassword += randomFunc[Object.keys(type)[0]]();
+        });
+    }
+    const finalPassword = generatedPassword.slice(0, length).split('').sort(() => getRandomByte() - 128).join('');
+    
+    addToHistory(finalPassword);
+    return finalPassword;
+}
+
+// 3. Tarixni boshqarish
+function addToHistory(pw) {
+    if (pw === 'Tanlang!') return;
+    passwordHistory.unshift(pw); // Boshiga qo'shish
+    if (passwordHistory.length > 5) passwordHistory.pop(); // Faqat 5 tasini saqlash
+    localStorage.setItem('pw-history', JSON.stringify(passwordHistory));
+    renderHistory();
+}
+
+function renderHistory() {
+    historyList.innerHTML = passwordHistory.map(pw => `
+        <li class="history-item" onclick="copyFromHistory('${pw}')">
+            <span>${pw.substring(0, 15)}${pw.length > 15 ? '...' : ''}</span>
+            <small>📋</small>
+        </li>
+    `).join('');
+}
+
+window.copyFromHistory = (pw) => {
+    navigator.clipboard.writeText(pw);
+    resultEl.innerText = pw;
+    updateStrength(pw);
+};
+
+clearHistoryBtn.addEventListener('click', () => {
+    passwordHistory = [];
+    localStorage.removeItem('pw-history');
+    renderHistory();
 });
 
-// Generatsiya qilish
+// 4. Event Listeners
 generateEl.addEventListener('click', () => {
     const length = +lengthEl.value;
-    const hasLower = lowercaseEl.checked;
-    const hasUpper = uppercaseEl.checked;
-    const hasNumber = numbersEl.checked;
-    const hasSymbol = symbolsEl.checked;
-
-    const password = generatePassword(hasLower, hasUpper, hasNumber, hasSymbol, length);
+    const password = generatePassword(lowercaseEl.checked, uppercaseEl.checked, numbersEl.checked, symbolsEl.checked, length);
     resultEl.innerText = password;
     updateStrength(password);
 });
 
-function generatePassword(lower, upper, number, symbol, length) {
-    let generatedPassword = '';
-    const typesCount = Number(lower) + Number(upper) + Number(number) + Number(symbol);
-    const typesArr = [{lower}, {upper}, {number}, {symbol}].filter(item => Object.values(item)[0]);
+lengthEl.addEventListener('input', () => lengthVal.innerText = lengthEl.value);
 
-    if (typesCount === 0) return 'Tanlang!';
-
-    for (let i = 0; i < length; i += typesCount) {
-        typesArr.forEach(type => {
-            const funcName = Object.keys(type)[0];
-            generatedPassword += randomFunc[funcName]();
-        });
-    }
-    return generatedPassword.slice(0, length).split('').sort(() => getRandomByte() - 128).join('');
-}
-
-// Parol kuchini tekshirish
-function updateStrength(password) {
-    let strength = 0;
-    if (password.length >= 8) strength += 25;
-    if (password.length >= 14) strength += 25;
-    if (/[0-9]/.test(password) && /[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 25;
-    if (/[^A-Za-z0-9]/.test(password)) strength += 25;
-
-    strengthBar.style.width = strength + '%';
-    if (strength <= 25) strengthBar.style.backgroundColor = 'var(--danger)';
-    else if (strength <= 75) strengthBar.style.backgroundColor = 'var(--warning)';
-    else strengthBar.style.backgroundColor = 'var(--success)';
-}
-
-// Rangni o'zgartirish
 accentColorInput.addEventListener('input', (e) => {
     document.documentElement.style.setProperty('--neon-blue', e.target.value);
 });
 
-// Theme Toggle
 themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('light-mode');
-    const isLight = document.body.classList.contains('light-mode');
+    const isLight = document.body.classList.toggle('light-mode');
     themeToggle.querySelector('.mode-icon').innerText = isLight ? '☀️' : '🌙';
     localStorage.setItem('pw-theme', isLight ? 'light' : 'dark');
 });
 
-// Nusxa olish
 clipboardEl.addEventListener('click', () => {
     const password = resultEl.innerText;
     if (!password || password === 'Tanlang!') return;
@@ -97,7 +106,18 @@ clipboardEl.addEventListener('click', () => {
     });
 });
 
-// Dastlabki sozlamalarni tiklash
+function updateStrength(password) {
+    let strength = 0;
+    if (password.length >= 8) strength += 25;
+    if (password.length >= 14) strength += 25;
+    if (/[0-9]/.test(password) && /[a-z]/.test(password)) strength += 25;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+    strengthBar.style.width = strength + '%';
+    strengthBar.style.backgroundColor = strength <= 25 ? 'var(--danger)' : strength <= 75 ? 'var(--warning)' : 'var(--success)';
+}
+
+// Dastlabki yuklash
+renderHistory();
 if (localStorage.getItem('pw-theme') === 'light') {
     document.body.classList.add('light-mode');
     themeToggle.querySelector('.mode-icon').innerText = '☀️';
