@@ -1,0 +1,138 @@
+:root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --primary: #38bdf8;
+    --secondary: #818cf8;
+    --accent: #f472b6;
+    --text: #f8fafc;
+}
+
+body {
+    background-color: var(--bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 380px;
+    backdrop-filter: blur(10px);
+}
+
+.title {
+    text-align: center;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-box {
+    background: rgba(15, 23, 42, 0.6);
+    padding: 1rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--primary);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    margin-bottom: 1.5rem;
+}
+
+#result {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    color: var(--primary);
+    word-break: break-all;
+}
+
+#clipboard {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    width: 24px;
+    transition: transform 0.2s;
+}
+
+#clipboard:hover { transform: scale(1.2); color: var(--accent); }
+
+/* Uiverse Style Checkbox */
+.container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+}
+
+.container input { position: absolute; opacity: 0; cursor: pointer; }
+
+.checkmark {
+    position: absolute;
+    top: 0; left: 0;
+    height: 20px; width: 20px;
+    background-color: #334155;
+    border-radius: 4px;
+}
+
+.container:hover input ~ .checkmark { background-color: #475569; }
+
+.container input:checked ~ .checkmark {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+}
+
+.checkmark:after {
+    content: ""; position: absolute; display: none;
+    left: 7px; top: 3px; width: 5px; height: 10px;
+    border: solid white; border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.container input:checked ~ .checkmark:after { display: block; }
+
+.grid-settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+/* Slider Style */
+.slider {
+    width: 100%;
+    margin: 15px 0;
+    accent-color: var(--primary);
+}
+
+.generate-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: white;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(129, 140, 248, 0.4);
+}
+
+.generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(129, 140, 248, 0.6);
+}
