@@ -12,6 +12,7 @@ const accentColorInput = document.getElementById('accent-color');
 const themeToggle = document.getElementById('theme-toggle');
 const historyList = document.getElementById('password-history');
 const clearHistoryBtn = document.getElementById('clear-history');
+const exportBtn = document.getElementById('export-btn');
 
 let passwordHistory = JSON.parse(localStorage.getItem('pw-history')) || [];
 
@@ -28,23 +29,35 @@ const randomFunc = {
     symbol: () => "!@#$%^&*()_+~`|}{[]:;?><,./-=".charAt(getRandomByte() % 29)
 };
 
-function generatePassword(lower, upper, number, symbol, length) {
-    let generatedPassword = '';
-    const typesArr = [{lower}, {upper}, {number}, {symbol}].filter(item => Object.values(item)[0]);
-    if (typesArr.length === 0) return 'Tanlang!';
+// Generatsiya funksiyasi
+function createPassword() {
+    const length = +lengthEl.value;
+    const hasLower = lowercaseEl.checked;
+    const hasUpper = uppercaseEl.checked;
+    const hasNumber = numbersEl.checked;
+    const hasSymbol = symbolsEl.checked;
 
+    const typesArr = [{lower: hasLower}, {upper: hasUpper}, {number: hasNumber}, {symbol: hasSymbol}].filter(item => Object.values(item)[0]);
+    if (typesArr.length === 0) {
+        resultEl.innerText = 'Tanlang!';
+        return;
+    }
+
+    let generatedPassword = '';
     for (let i = 0; i < length; i += typesArr.length) {
         typesArr.forEach(type => {
             generatedPassword += randomFunc[Object.keys(type)[0]]();
         });
     }
     const finalPassword = generatedPassword.slice(0, length).split('').sort(() => getRandomByte() - 128).join('');
-    addToHistory(finalPassword);
+    resultEl.innerText = finalPassword;
+    updateStrength(finalPassword);
     return finalPassword;
 }
 
+// Tarixga qo'shish
 function addToHistory(pw) {
-    if (pw === 'Tanlang!') return;
+    if (pw === 'Tanlang!' || !pw) return;
     passwordHistory.unshift(pw);
     if (passwordHistory.length > 5) passwordHistory.pop();
     localStorage.setItem('pw-history', JSON.stringify(passwordHistory));
@@ -54,7 +67,7 @@ function addToHistory(pw) {
 function renderHistory() {
     historyList.innerHTML = passwordHistory.map(pw => `
         <li class="history-item" onclick="copyFromHistory('${pw}')">
-            <span>${pw.substring(0, 15)}...</span>
+            <span>${pw.substring(0, 15)}${pw.length > 15 ? '...' : ''}</span>
             <small>📋</small>
         </li>
     `).join('');
@@ -64,21 +77,37 @@ window.copyFromHistory = (pw) => {
     navigator.clipboard.writeText(pw);
     resultEl.innerText = pw;
     updateStrength(pw);
-    const originalColor = resultEl.style.color;
-    resultEl.style.color = 'var(--success)';
-    setTimeout(() => resultEl.style.color = originalColor, 500);
 };
 
-generateEl.addEventListener('click', () => {
-    const password = generatePassword(lowercaseEl.checked, uppercaseEl.checked, numbersEl.checked, symbolsEl.checked, +lengthEl.value);
-    resultEl.innerText = password;
-    updateStrength(password);
+// Export
+exportBtn.addEventListener('click', () => {
+    if (passwordHistory.length === 0) return;
+    const blob = new Blob(["Pass History:\n" + passwordHistory.join('\n')], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'passwords.txt';
+    a.click();
 });
 
-lengthEl.addEventListener('input', () => lengthVal.innerText = lengthEl.value);
+// --- AVTOMATIK GENERATSIYA VA SAQLASH ---
+[lengthEl, uppercaseEl, lowercaseEl, numbersEl, symbolsEl].forEach(el => {
+    el.addEventListener('change', createPassword);
+    el.addEventListener('input', () => {
+        lengthVal.innerText = lengthEl.value;
+        if(el === lengthEl) createPassword();
+    });
+});
 
+generateEl.addEventListener('click', () => {
+    const pw = createPassword();
+    addToHistory(pw);
+});
+
+// Rangni eslab qolish
 accentColorInput.addEventListener('input', (e) => {
-    document.documentElement.style.setProperty('--neon-blue', e.target.value);
+    const color = e.target.value;
+    document.documentElement.style.setProperty('--neon-blue', color);
+    localStorage.setItem('pw-accent', color);
 });
 
 themeToggle.addEventListener('click', () => {
@@ -88,9 +117,9 @@ themeToggle.addEventListener('click', () => {
 });
 
 clipboardEl.addEventListener('click', () => {
-    const password = resultEl.innerText;
-    if (!password || password === 'Tanlang!') return;
-    navigator.clipboard.writeText(password).then(() => {
+    const pw = resultEl.innerText;
+    if (pw === 'Tanlang!') return;
+    navigator.clipboard.writeText(pw).then(() => {
         const oldText = resultEl.innerText;
         resultEl.innerText = 'NUSXALANDI! ✅';
         setTimeout(() => resultEl.innerText = oldText, 1000);
@@ -105,16 +134,24 @@ clearHistoryBtn.addEventListener('click', () => {
 
 function updateStrength(password) {
     let strength = 0;
-    if (password.length >= 8) strength += 25;
-    if (password.length >= 14) strength += 25;
-    if (/[0-9]/.test(password) && /[a-z]/.test(password)) strength += 25;
+    if (password.length >= 10) strength += 25;
+    if (/[0-9]/.test(password)) strength += 25;
+    if (/[A-Z]/.test(password)) strength += 25;
     if (/[^A-Za-z0-9]/.test(password)) strength += 25;
     strengthBar.style.width = strength + '%';
-    strengthBar.style.backgroundColor = strength <= 25 ? 'var(--danger)' : strength <= 75 ? 'var(--warning)' : 'var(--success)';
+    strengthBar.style.backgroundColor = strength <= 25 ? '#ff4d4d' : strength <= 75 ? '#ffbd2e' : '#2ecc71';
 }
 
-renderHistory();
+// Boshlang'ich holat
+const savedColor = localStorage.getItem('pw-accent');
+if(savedColor) {
+    document.documentElement.style.setProperty('--neon-blue', savedColor);
+    accentColorInput.value = savedColor;
+}
+
 if (localStorage.getItem('pw-theme') === 'light') {
     document.body.classList.add('light-mode');
     themeToggle.querySelector('.mode-icon').innerText = '☀️';
 }
+renderHistory();
+createPassword();
