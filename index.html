@@ -3,18 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Neon Generator</title>
+    <title>Pro Neon Password Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="card">
+        <div class="theme-settings">
+            <div class="color-picker-group">
+                <input type="color" id="accent-color" value="#00f2ff" title="Neon rangni tanlang">
+            </div>
+            <button id="theme-toggle" class="theme-btn" title="Rejimni o'zgartirish">
+                <span class="mode-icon">🌙</span>
+            </button>
+        </div>
+
         <h2 class="title">Neon Password</h2>
         
         <div class="result-box">
             <span id="result">P@ssw0rd123</span>
             <button id="clipboard" title="Nusxa olish">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
             </button>
         </div>
 
